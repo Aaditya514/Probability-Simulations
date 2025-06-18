@@ -54,7 +54,9 @@ class NaiveBayes {
 
 public:
     void train(const vector<pair<string, string>>& dataset) {
-        for (auto& [cls, word] : dataset) {
+        for (auto it = dataset.begin(); it != dataset.end(); ++it) {
+            const string& cls = it->first;
+            const string& word = it->second;
             classCount[cls]++;
             wordCount[cls][word]++;
             totalDocs++;
@@ -65,7 +67,8 @@ public:
         double maxProb = -1.0;
         string result = "Unknown";
 
-        for (auto& [cls, _] : classCount) {
+        for (auto it = classCount.begin(); it != classCount.end(); ++it) {
+            const string& cls = it->first;
             double prior = (double)classCount[cls] / totalDocs;
             double likelihood = (double)(wordCount[cls][word] + 1) / (classCount[cls] + 1); // Laplace smoothing
             double posterior = prior * likelihood;
@@ -90,10 +93,10 @@ void simulateMarkovChain(const map<string, map<string, double>>& transitionMatri
         double r = uniform_real_distribution<>(0, 1)(gen);
         double cumulative = 0.0;
 
-        for (auto& [nextState, prob] : transitionMatrix.at(currentState)) {
-            cumulative += prob;
+        for (auto& entry : transitionMatrix.at(currentState)) {
+            cumulative += entry.second;
             if (r <= cumulative) {
-                currentState = nextState;
+                currentState = entry.first;
                 break;
             }
         }
